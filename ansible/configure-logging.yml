@@ -1,0 +1,6 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: Deploy ELK stack
+      shell: |
+        kubectl apply -f https://download.elastic.co/downloads/eck/2.9.0/all-in-one.yaml

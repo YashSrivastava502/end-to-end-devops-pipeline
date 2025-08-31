@@ -1,0 +1,50 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  dockerRegistryServiceConnection: 'dockerhub-connection'
+  imageRepositoryFlask: 'yashsrivastava502/flask-app'
+  imageRepositoryDB: 'yashsrivastava502/mysql-db'
+  kubernetesServiceConnection: 'aks-connection'
+  namespace: 'default'
+
+stages:
+- stage: Build
+  jobs:
+  - job: DockerBuild
+    steps:
+    - task: Docker@2
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepositoryFlask)
+        dockerfile: app/frontend/Dockerfile
+        tags: latest
+        containerRegistry: $(dockerRegistryServiceConnection)
+
+    - task: Docker@2
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepositoryDB)
+        dockerfile: app/backend/Dockerfile
+        tags: latest
+        containerRegistry: $(dockerRegistryServiceConnection)
+
+- stage: Deploy
+  dependsOn: Build
+  jobs:
+  - job: DeployToAKS
+    steps:
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscriptionEndpoint: $(kubernetesServiceConnection)
+        namespace: $(namespace)
+        command: apply
+        useConfigurationFile: true
+        configuration: |
+          k8s/deployment.yaml
+          k8s/service.yaml
+          k8s/ingress.yaml

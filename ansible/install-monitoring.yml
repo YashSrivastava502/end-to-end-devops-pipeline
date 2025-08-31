@@ -1,0 +1,12 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: Install Helm
+      shell: |
+        curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+    - name: Add Prometheus repo
+      shell: helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+    - name: Install Prometheus + Grafana
+      shell: helm install monitoring prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace

@@ -11,4 +11,4 @@ This project demonstrates a **complete DevOps pipeline** with:
 ## ⚙️ Setup Instructions
 1. Clone repo:
    ```bash
-   git clone 
+   git clone https://github.com/YashSrivastava502/end-to-end-devops-pipeline
